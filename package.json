@@ -12,6 +12,7 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
+    "docs": "node .\\node_modules/jsdoc/jsdoc.js -c ./.jsdoc.conf.json",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -34,5 +35,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "jsdoc": "^3.6.7"
   }
 }
