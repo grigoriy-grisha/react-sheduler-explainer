@@ -5,6 +5,9 @@ import {
   unstable_getFirstCallbackNode,
   unstable_cancelCallback,
   unstable_requestPaint,
+  unstable_shouldYield,
+  unstable_pauseExecution,
+  unstable_continueExecution,
 } from "./forks/Scheduler";
 import {
   NormalPriority,
@@ -166,8 +169,6 @@ input.addEventListener("input", () => {
     slowTask();
   });
 
-  // unstable_scheduleCallback(NormalPriority, () => {
-  console.log("123");
   hello.innerHTML = "";
   const elem = document.createElement("div");
 
@@ -176,6 +177,11 @@ input.addEventListener("input", () => {
     newElem.innerHTML = Math.random().toString();
     elem.appendChild(newElem);
   });
-  hello.insertAdjacentElement("beforebegin", elem);
-  // });
+  hello.appendChild(elem);
+
+  if (unstable_shouldYield()) {
+    unstable_pauseExecution();
+
+    setTimeout(() => unstable_continueExecution());
+  }
 });

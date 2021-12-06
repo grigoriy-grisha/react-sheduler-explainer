@@ -12,7 +12,7 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "docs": "node .\\node_modules/jsdoc/jsdoc.js -c ./.jsdoc.conf.json",
+    "docs": "node .\\node_modules/jsdoc/jsdoc.js -c ./.jsdoc.conf.json README.md",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

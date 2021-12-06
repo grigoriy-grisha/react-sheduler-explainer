@@ -370,9 +370,11 @@ function unstable_cancelCallback(task) {
 function unstable_getCurrentPriorityLevel() {
   return currentPriorityLevel;
 }
-
+/**  выполняются ли в данные момент какие-то задачи */
 let isMessageLoopRunning = false;
+
 let scheduledHostCallback = null;
+
 let taskTimeoutID = -1;
 
 // Scheduler periodically yields in case there is other work on the main
@@ -520,8 +522,14 @@ if (typeof localSetImmediate === "function") {
   };
 }
 
+/**
+ * @description Выполнить обратный вызов в следующий момент времени (макро-задача)
+ * @param callback {function} функция, которую нужно выполнить, тут используется только flushWork
+ */
 function requestHostCallback(callback) {
   scheduledHostCallback = callback;
+
+  /** если задачи не запущены, то запускаем новую */
   if (!isMessageLoopRunning) {
     isMessageLoopRunning = true;
     schedulePerformWorkUntilDeadline();
