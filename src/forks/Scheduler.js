@@ -59,10 +59,13 @@ var isSchedulerPaused = false;
 var currentTask = null;
 var currentPriorityLevel = NormalPriority;
 
-// This is set while performing work, to prevent re-entrancy.
+/** Это устанавливается во время выполнения работы, чтобы предотвратить повторное включение. */
 var isPerformingWork = false;
 
+/** планируется ли функция обратного вызова  */
 var isHostCallbackScheduled = false;
+
+/** запланирвоанная функция обратного вызова, которую передаем в scheduleCallback */
 var isHostTimeoutScheduled = false;
 
 // Capture local references to native APIs, in case a polyfill overrides them.
@@ -98,6 +101,7 @@ function handleTimeout(currentTime) {
 
   if (!isHostCallbackScheduled) {
     if (peek(taskQueue) !== null) {
+      /** если очередь задач не пуста */
       isHostCallbackScheduled = true;
       requestHostCallback(flushWork);
     } else {
@@ -130,10 +134,18 @@ function flushWork(hasTimeRemaining, initialTime) {
   }
 }
 
+/**
+ *
+ * @param hasTimeRemaining {boolean}
+ * @param initialTime {number}
+ * @returns {boolean} возврат полностью бесполезен, он нигде не используется
+ */
 function workLoop(hasTimeRemaining, initialTime) {
   let currentTime = initialTime;
   advanceTimers(currentTime);
   currentTask = peek(taskQueue);
+
+  /** выполнять пока есть задачи и планировщик не остановлен */
   while (currentTask !== null && !isSchedulerPaused) {
     if (
       currentTask.expirationTime > currentTime &&
@@ -247,7 +259,7 @@ function unstable_wrapCallback(callback) {
                          } приоритет задачи
  *  @param callback {function} функция, которую нужно запланировать
  *  @param options {{ delay: number }} объект с delay
- *  @return {{ priorityLevel: ImmediatePriority | UserBlockingPriority | NormalPriority | LowPriority | IdlePriority,
+ *  @return {{ priorityLevel: 0 | 1 | 2 | 3 | 4 | 5,
  *             sortIndex: number,
  *             expirationTime: number,
  *             callback: Function,
@@ -256,6 +268,7 @@ function unstable_wrapCallback(callback) {
  *           }} объект новой таски с метаданными
  */
 function unstable_scheduleCallback(priorityLevel, callback, options) {
+  ё;
   var currentTime = getCurrentTime();
 
   /** определение startTime */
@@ -306,7 +319,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
 
   /** выпоняется, если задаче установлен delay,
    * то планируем задачу через requestHostTimeout (setTimeout, setImmediate, postMessages)
-   * */
+   */
   if (startTime > currentTime) {
     // This is a delayed task.
     newTask.sortIndex = startTime;
@@ -373,6 +386,12 @@ function unstable_getCurrentPriorityLevel() {
 /**  выполняются ли в данные момент какие-то задачи */
 let isMessageLoopRunning = false;
 
+/**
+ * запланированный callback, тот который передаем в scheduleCallback.
+ * Функция типа (hasTimeRemaining: boolean, currentTime: number) => void или null
+ * В этой переменной хранится функция flushWork или null
+ * @type {function | null}
+ * */
 let scheduledHostCallback = null;
 
 let taskTimeoutID = -1;
@@ -454,6 +473,9 @@ function forceFrameRate(fps) {
   }
 }
 
+/**
+ * Выполнять задачи до дедлайна
+ * */
 const performWorkUntilDeadline = () => {
   if (scheduledHostCallback !== null) {
     const currentTime = getCurrentTime();
@@ -461,6 +483,7 @@ const performWorkUntilDeadline = () => {
     // cycle. This means there's always time remaining at the beginning of
     // the message event.
     deadline = currentTime + yieldInterval;
+    /** Значение нигде не меняется и так передается в scheduledHostCallback (flushWork), а затем workLoop  */
     const hasTimeRemaining = true;
 
     // If a scheduler task throws, exit the current browser task so the
@@ -471,6 +494,7 @@ const performWorkUntilDeadline = () => {
     // `hasMoreWork` will remain true, and we'll continue the work loop.
     let hasMoreWork = true;
     try {
+      /** выполянем scheduledHostCallback (flushWork) */
       hasMoreWork = scheduledHostCallback(hasTimeRemaining, currentTime);
     } finally {
       if (hasMoreWork) {
@@ -536,12 +560,18 @@ function requestHostCallback(callback) {
   }
 }
 
+/**
+ * @description setTimeout
+ */
 function requestHostTimeout(callback, ms) {
   taskTimeoutID = localSetTimeout(() => {
     callback(getCurrentTime());
   }, ms);
 }
 
+/**
+ * @description  clearTimeout
+ */
 function cancelHostTimeout() {
   localClearTimeout(taskTimeoutID);
   taskTimeoutID = -1;
