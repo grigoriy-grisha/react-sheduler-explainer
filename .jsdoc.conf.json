@@ -3,7 +3,11 @@
   "recurseDepth": 10,
   "opts": {
     "recurse": true,
-    "destination": "./docs/"
+    "destination": "./docs/",
+    "encoding": "utf8",
+    "readme": "./README.md",
+    "verbose": true,
+    "template": "node_modules/minami"
   },
   "source": {
     "include": ["src"],
