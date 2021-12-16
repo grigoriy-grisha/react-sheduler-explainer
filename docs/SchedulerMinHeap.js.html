@@ -2,35 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>SchedulerMinHeap.js - Documentation</title>
+    <title>JSDoc: Source: SchedulerMinHeap.js</title>
 
-    <script src="scripts/prettify/prettify.js"></script>
-    <script src="scripts/prettify/lang-css.js"></script>
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
     <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
 </head>
+
 <body>
 
-<input type="checkbox" id="nav-trigger" class="nav-trigger" />
-<label for="nav-trigger" class="navicon-button x">
-  <div class="navicon"></div>
-</label>
-
-<label for="nav-trigger" class="overlay"></label>
-
-<nav>
-    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#cancelHostTimeout">cancelHostTimeout</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#compare">compare</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#isHostCallbackScheduled">isHostCallbackScheduled</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#isHostTimeoutScheduled">isHostTimeoutScheduled</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#isMessageLoopRunning">isMessageLoopRunning</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#isPerformingWork">isPerformingWork</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#NoPriority">NoPriority</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#peek">peek</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#performWorkUntilDeadline">performWorkUntilDeadline</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#pop">pop</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#push">push</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#requestHostCallback">requestHostCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#requestHostTimeout">requestHostTimeout</a></span></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#scheduledHostCallback">scheduledHostCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#siftDown">siftDown</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#siftUp">siftUp</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#slowTask">slowTask</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#unstable_getFirstCallbackNode">unstable_getFirstCallbackNode</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#unstable_scheduleCallback">unstable_scheduleCallback</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#workLoop">workLoop</a></span></li>
-</nav>
-
 <div id="main">
-    
-    <h1 class="page-title">SchedulerMinHeap.js</h1>
-    
+
+    <h1 class="page-title">Source: SchedulerMinHeap.js</h1>
 
     
 
@@ -48,12 +35,15 @@
  * @flow strict
  */
 
+/** @namespace Scheduler Heap Code */
+
 /**
  *  в этом файле находится реализация бинарной кучи,
  *  которая используется для приоритизированного хранения задач
  */
 
 /**
+ *  @memberof Scheduler Heap Code
  *  @description Пушит элемент в конец кучи, дальше с помощью siftUp куча нормализуется,
  *  так как новый элемент может иметь вес больше,чем у его parent элементов и они меняются местами
  *  @param node {{  id: number, sortIndex: number}} элемент, который нужно запушить,
@@ -67,6 +57,7 @@ export function push(heap, node) {
 }
 
 /**
+ *  @memberof Scheduler Heap Code
  *  @description Отдает самый верхний элемент кучи
  *  @param heap {{  id: number, sortIndex: number}[]} куча, из которой нужно достать элемент
  *  @return {{ id: number, sortIndex: number} | null} если куча не пуста,
@@ -77,6 +68,7 @@ export function peek(heap) {
 }
 
 /**
+ *  @memberof Scheduler Heap Code
  *  @description удаляет самый последний элемент, затем меняет местами последний и первый элемент,
  *  после этого куча нормализуется с помощью siftDown
  *  @param heap {{  id: number, sortIndex: number}[]} куча, из которой нужно удалить последний элемент
@@ -96,6 +88,7 @@ export function pop(heap) {
 }
 
 /**
+ *  @memberof Scheduler Heap Code
  *  @description нормализация кучи "на месте", просеиваиние элементов вверх
  *  @param heap {{  id: number, sortIndex: number}[]} куча, которую нужно нормализотвать, после вставки
  *  @param node {{  id: number, sortIndex: number}} элемент, который нужно вставить
@@ -120,6 +113,7 @@ function siftUp(heap, node, i) {
 }
 
 /**
+ *  @memberof Scheduler Heap Code
  *  @description нормализация кучи "на месте", просеиваиние элементов вниз
  *  @param heap {{  id: number, sortIndex: number}[]} куча, которую нужно нормализотвать, после удаления
  *  @param node {{  id: number, sortIndex: number}} элемент, последний элемент
@@ -159,6 +153,7 @@ function siftDown(heap, node, i) {
 }
 
 /**
+ *  @memberof Scheduler Heap Code
  *  @description функция сравнения двух элементов кучи
  *  @param a {{  id: number, sortIndex: number}}  левый элемент
  *  @param b {{  id: number, sortIndex: number}}  правый элемент
@@ -178,13 +173,17 @@ function compare(a, b) {
 
 </div>
 
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="Scheduler%2520Code.html">Scheduler Code</a></li><li><a href="Scheduler%2520Heap%2520Code.html">Scheduler Heap Code</a></li></ul><h3>Global</h3><ul><li><a href="global.html#isMessageLoopRunning">isMessageLoopRunning</a></li><li><a href="global.html#NoPriority">NoPriority</a></li><li><a href="global.html#hasMoreWork">hasMoreWork</a></li><li><a href="global.html#slowTask">slowTask</a></li></ul>
+</nav>
+
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> on Thu Dec 16 2021 00:10:49 GMT+0300 (Москва, стандартное время) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Thu Dec 16 2021 13:57:40 GMT+0300 (Москва, стандартное время)
 </footer>
 
-<script>prettyPrint();</script>
-<script src="scripts/linenumber.js"></script>
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
 </body>
 </html>

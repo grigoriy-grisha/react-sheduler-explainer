@@ -8,6 +8,8 @@
 
 /* eslint-disable no-var */
 
+/** @namespace Scheduler Code */
+
 import { push, pop, peek } from "../SchedulerMinHeap";
 
 // TODO: Use symbols?
@@ -59,13 +61,22 @@ var isSchedulerPaused = false;
 var currentTask = null;
 var currentPriorityLevel = NormalPriority;
 
-/** Это устанавливается во время выполнения работы, чтобы предотвратить повторное включение. */
+/**
+ * @memberof Scheduler Code
+ * Это устанавливается во время выполнения работы, чтобы предотвратить повторное включение.
+ * */
 var isPerformingWork = false;
 
-/** планируется ли функция обратного вызова  */
+/**
+ * @memberof Scheduler Code
+ * планируется ли функция обратного вызова
+ * */
 var isHostCallbackScheduled = false;
 
-/** запланирвоанная функция обратного вызова, которую передаем в scheduleCallback */
+/**
+ * @memberof Scheduler Code
+ * запланирвоанная функция обратного вызова, которую передаем в scheduleCallback
+ * */
 var isHostTimeoutScheduled = false;
 
 // Capture local references to native APIs, in case a polyfill overrides them.
@@ -135,7 +146,7 @@ function flushWork(hasTimeRemaining, initialTime) {
 }
 
 /**
- *
+ * @memberof Scheduler Code
  * @param hasTimeRemaining {boolean}
  * @param initialTime {number}
  * @returns {boolean} возврат полностью бесполезен, он нигде не используется
@@ -250,6 +261,7 @@ function unstable_wrapCallback(callback) {
 }
 
 /**
+ * @memberof Scheduler Code
  *  @description Планирует callback по приоритету или delay
  *  @param priorityLevel {  ImmediatePriority,
                             UserBlockingPriority,
@@ -365,6 +377,7 @@ function unstable_continueExecution() {
 }
 
 /**
+ * @memberof Scheduler Code
  *  @description Отдает самый верхний элемент кучи с самым высоким приоритетом
  *  @return {{ id: number, sortIndex: number} | null} если куча не пуста,
  *  то возвращаем элемент с самым высоким приоритетом, иначе null
@@ -387,6 +400,7 @@ function unstable_getCurrentPriorityLevel() {
 let isMessageLoopRunning = false;
 
 /**
+ * @memberof Scheduler Code
  * запланированный callback, тот который передаем в scheduleCallback.
  * Функция типа (hasTimeRemaining: boolean, currentTime: number) => void или null
  * В этой переменной хранится функция flushWork или null
@@ -474,6 +488,7 @@ function forceFrameRate(fps) {
 }
 
 /**
+ * @memberof Scheduler Code
  * Выполнять задачи до дедлайна
  * */
 const performWorkUntilDeadline = () => {
@@ -547,6 +562,7 @@ if (typeof localSetImmediate === "function") {
 }
 
 /**
+ * @memberof Scheduler Code
  * @description Выполнить обратный вызов в следующий момент времени (макро-задача)
  * @param callback {function} функция, которую нужно выполнить, тут используется только flushWork
  */
@@ -561,6 +577,7 @@ function requestHostCallback(callback) {
 }
 
 /**
+ * @memberof Scheduler Code
  * @description setTimeout
  */
 function requestHostTimeout(callback, ms) {
@@ -570,6 +587,7 @@ function requestHostTimeout(callback, ms) {
 }
 
 /**
+ * @memberof Scheduler Code
  * @description  clearTimeout
  */
 function cancelHostTimeout() {

@@ -6,8 +6,8 @@
     "destination": "./docs/",
     "encoding": "utf8",
     "readme": "./README.md",
-    "verbose": true,
-    "template": "node_modules/minami"
+    "verbose": true
+
   },
   "source": {
     "include": ["src"],

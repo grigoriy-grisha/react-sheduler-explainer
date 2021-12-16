@@ -7,12 +7,15 @@
  * @flow strict
  */
 
+/** @namespace Scheduler Heap Code */
+
 /**
  *  в этом файле находится реализация бинарной кучи,
  *  которая используется для приоритизированного хранения задач
  */
 
 /**
+ *  @memberof Scheduler Heap Code
  *  @description Пушит элемент в конец кучи, дальше с помощью siftUp куча нормализуется,
  *  так как новый элемент может иметь вес больше,чем у его parent элементов и они меняются местами
  *  @param node {{  id: number, sortIndex: number}} элемент, который нужно запушить,
@@ -26,6 +29,7 @@ export function push(heap, node) {
 }
 
 /**
+ *  @memberof Scheduler Heap Code
  *  @description Отдает самый верхний элемент кучи
  *  @param heap {{  id: number, sortIndex: number}[]} куча, из которой нужно достать элемент
  *  @return {{ id: number, sortIndex: number} | null} если куча не пуста,
@@ -36,6 +40,7 @@ export function peek(heap) {
 }
 
 /**
+ *  @memberof Scheduler Heap Code
  *  @description удаляет самый последний элемент, затем меняет местами последний и первый элемент,
  *  после этого куча нормализуется с помощью siftDown
  *  @param heap {{  id: number, sortIndex: number}[]} куча, из которой нужно удалить последний элемент
@@ -55,6 +60,7 @@ export function pop(heap) {
 }
 
 /**
+ *  @memberof Scheduler Heap Code
  *  @description нормализация кучи "на месте", просеиваиние элементов вверх
  *  @param heap {{  id: number, sortIndex: number}[]} куча, которую нужно нормализотвать, после вставки
  *  @param node {{  id: number, sortIndex: number}} элемент, который нужно вставить
@@ -79,6 +85,7 @@ function siftUp(heap, node, i) {
 }
 
 /**
+ *  @memberof Scheduler Heap Code
  *  @description нормализация кучи "на месте", просеиваиние элементов вниз
  *  @param heap {{  id: number, sortIndex: number}[]} куча, которую нужно нормализотвать, после удаления
  *  @param node {{  id: number, sortIndex: number}} элемент, последний элемент
@@ -118,6 +125,7 @@ function siftDown(heap, node, i) {
 }
 
 /**
+ *  @memberof Scheduler Heap Code
  *  @description функция сравнения двух элементов кучи
  *  @param a {{  id: number, sortIndex: number}}  левый элемент
  *  @param b {{  id: number, sortIndex: number}}  правый элемент
