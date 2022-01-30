@@ -86,6 +86,7 @@ const localClearTimeout =
 const localSetImmediate =
   typeof setImmediate !== "undefined" ? setImmediate : null; // IE and Node.js + jsdom
 
+//todo тут и проиводится передача задач из тймер очереди в таск очередь
 function advanceTimers(currentTime) {
   // Check for tasks that are no longer delayed and add them to the queue.
   let timer = peek(timerQueue);
@@ -158,6 +159,7 @@ function workLoop(hasTimeRemaining, initialTime) {
 
   /** выполнять пока есть задачи и планировщик не остановлен */
   while (currentTask !== null && !isSchedulerPaused) {
+    /** если время вышло у задачи, то выходим из цикла */
     if (
       currentTask.expirationTime > currentTime &&
       (!hasTimeRemaining || shouldYieldToHost())
@@ -174,22 +176,27 @@ function workLoop(hasTimeRemaining, initialTime) {
       const continuationCallback = callback(didUserCallbackTimeout);
       currentTime = getCurrentTime();
       if (typeof continuationCallback === "function") {
+        /** если задача возвращает функцию, то помещаем эту функцию в эту же задачу */
         currentTask.callback = continuationCallback;
       } else {
+        /** удаляем функцию, если задача не возвращает функцию */
         if (currentTask === peek(taskQueue)) {
           pop(taskQueue);
         }
       }
       advanceTimers(currentTime);
     } else {
+      /** удаляем функцию, если задача не имеет функции */
       pop(taskQueue);
     }
     currentTask = peek(taskQueue);
   }
-  // Return whether there's additional work
+
   if (currentTask !== null) {
+    /** Если есть еще задачи в очереди, возвращаем true (есть еще работа) */
     return true;
   } else {
+    /** Проеряем есть ли задачи в очереди таймеров, если есть, то планируем новый flushWork  */
     const firstTimer = peek(timerQueue);
     if (firstTimer !== null) {
       requestHostTimeout(handleTimeout, firstTimer.startTime - currentTime);
@@ -280,7 +287,6 @@ function unstable_wrapCallback(callback) {
  *           }} объект новой таски с метаданными
  */
 function unstable_scheduleCallback(priorityLevel, callback, options) {
-  ё;
   var currentTime = getCurrentTime();
 
   /** определение startTime */
@@ -499,6 +505,7 @@ const performWorkUntilDeadline = () => {
     // the message event.
     deadline = currentTime + yieldInterval;
     /** Значение нигде не меняется и так передается в scheduledHostCallback (flushWork), а затем workLoop  */
+      //todo посмотреть, не удалил ли я ниего лишнего
     const hasTimeRemaining = true;
 
     // If a scheduler task throws, exit the current browser task so the
