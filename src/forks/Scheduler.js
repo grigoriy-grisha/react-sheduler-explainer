@@ -86,16 +86,20 @@ const localClearTimeout =
 const localSetImmediate =
   typeof setImmediate !== "undefined" ? setImmediate : null; // IE and Node.js + jsdom
 
-//todo тут и проиводится передача задач из тймер очереди в таск очередь
+/** @description Проверяет задачи, которые больше не задерживаются, и добавляет их из очереди таймеров в очередь задач.
+ *  @param currentTime {number} текущее время
+ *  @return void
+ *  @memberof Scheduler Code
+ * */
 function advanceTimers(currentTime) {
   // Check for tasks that are no longer delayed and add them to the queue.
   let timer = peek(timerQueue);
   while (timer !== null) {
     if (timer.callback === null) {
-      // Timer was cancelled.
+      /** Тайер был отменен, удалить его из очереди */
       pop(timerQueue);
     } else if (timer.startTime <= currentTime) {
-      // Timer fired. Transfer to the task queue.
+      /** Тайер сработал, переместить его в очередь тасок */
       pop(timerQueue);
       timer.sortIndex = timer.expirationTime;
       push(taskQueue, timer);
@@ -109,15 +113,17 @@ function advanceTimers(currentTime) {
 
 function handleTimeout(currentTime) {
   isHostTimeoutScheduled = false;
+  /** перемещаем истекшие таймеры в очеред тасок  */
   advanceTimers(currentTime);
 
   if (!isHostCallbackScheduled) {
     if (peek(taskQueue) !== null) {
-      /** если очередь задач не пуста */
+      /** если очередь задач не пуста, запускаем синхронно flushWork */
       isHostCallbackScheduled = true;
       requestHostCallback(flushWork);
     } else {
       const firstTimer = peek(timerQueue);
+      /** если очередь таймеров не пуста , планиурем заново handleTimeout  */
       if (firstTimer !== null) {
         requestHostTimeout(handleTimeout, firstTimer.startTime - currentTime);
       }
@@ -150,7 +156,9 @@ function flushWork(hasTimeRemaining, initialTime) {
  * @memberof Scheduler Code
  * @param hasTimeRemaining {boolean}
  * @param initialTime {number}
- * @returns {boolean} возврат полностью бесполезен, он нигде не используется
+ * @memberof Scheduler Code
+ * @returns {boolean} Возврат используется в функции performWorkUntilDeadline для определения есть ли еще работа, если есть,
+ * то планируем новый workLoop. При планировании flushWork, который вызывает workLoop присваивается переменной scheduledHostCallback
  */
 function workLoop(hasTimeRemaining, initialTime) {
   let currentTime = initialTime;
@@ -186,9 +194,10 @@ function workLoop(hasTimeRemaining, initialTime) {
       }
       advanceTimers(currentTime);
     } else {
-      /** удаляем функцию, если задача не имеет функции */
+      /** удаляем таску, если задача не имеет функции */
       pop(taskQueue);
     }
+    /** берем новую задачу из очереди задач */
     currentTask = peek(taskQueue);
   }
 
@@ -268,7 +277,7 @@ function unstable_wrapCallback(callback) {
 }
 
 /**
- * @memberof Scheduler Code
+ *  @memberof Scheduler Code
  *  @description Планирует callback по приоритету или delay
  *  @param priorityLevel {  ImmediatePriority,
                             UserBlockingPriority,
@@ -323,7 +332,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
       break;
   }
 
-  /** вычисление срока дедлайна задачи */
+  /** вычисление срока истечения таймаута */
   var expirationTime = startTime + timeout;
 
   var newTask = {
@@ -355,7 +364,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
       requestHostTimeout(handleTimeout, startTime - currentTime);
     }
   } else {
-    /** если задаче не установлен  delay */
+    /** если задаче не установлен delay, то задача попадает в очередь тасок */
     newTask.sortIndex = expirationTime;
     push(taskQueue, newTask);
 
@@ -383,8 +392,8 @@ function unstable_continueExecution() {
 }
 
 /**
- * @memberof Scheduler Code
- *  @description Отдает самый верхний элемент кучи с самым высоким приоритетом
+ *  @memberof Scheduler Code
+ *  @description Отдает самый верхний элемент кучи тасок с самым высоким приоритетом
  *  @return {{ id: number, sortIndex: number} | null} если куча не пуста,
  *  то возвращаем элемент с самым высоким приоритетом, иначе null
  */
@@ -476,6 +485,10 @@ function requestPaint() {
   // Since we yield every frame regardless, `requestPaint` has no effect.
 }
 
+/**
+ * yieldInterval — это интервал, с которым React сам контролирует выполнение задач разделения времени.
+ * Интервал планирования может быть установлен в соответствии с обновлением различных устройств.
+ * */
 function forceFrameRate(fps) {
   if (fps < 0 || fps > 125) {
     // Using console['error'] to evade Babel and ESLint
@@ -570,13 +583,13 @@ if (typeof localSetImmediate === "function") {
 
 /**
  * @memberof Scheduler Code
- * @description Выполнить обратный вызов в следующий момент времени (макро-задача)
+ * @description Планируем flushWork вызов, scheduledHostCallback, это flushWork
  * @param callback {function} функция, которую нужно выполнить, тут используется только flushWork
  */
 function requestHostCallback(callback) {
   scheduledHostCallback = callback;
 
-  /** если задачи не запущены, то запускаем новую */
+  /** если performWorkUntilDeadline не запущена, то планируем вызов performWorkUntilDeadline */
   if (!isMessageLoopRunning) {
     isMessageLoopRunning = true;
     schedulePerformWorkUntilDeadline();
