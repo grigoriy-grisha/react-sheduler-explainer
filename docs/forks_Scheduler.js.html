@@ -114,15 +114,19 @@ const localClearTimeout =
 const localSetImmediate =
   typeof setImmediate !== "undefined" ? setImmediate : null; // IE and Node.js + jsdom
 
+/** @description Проверяет задачи, которые больше не задерживаются, и добавляет их из очереди таймеров в очередь задач.
+ *  @param currentTime {number} текущее время
+ *  @return void
+ * */
 function advanceTimers(currentTime) {
   // Check for tasks that are no longer delayed and add them to the queue.
   let timer = peek(timerQueue);
   while (timer !== null) {
     if (timer.callback === null) {
-      // Timer was cancelled.
+      /** Тайер был отменен, удалить его из очереди */
       pop(timerQueue);
     } else if (timer.startTime &lt;= currentTime) {
-      // Timer fired. Transfer to the task queue.
+      /** Тайер сработал, переместить его в очередь тасок */
       pop(timerQueue);
       timer.sortIndex = timer.expirationTime;
       push(taskQueue, timer);
@@ -140,11 +144,12 @@ function handleTimeout(currentTime) {
 
   if (!isHostCallbackScheduled) {
     if (peek(taskQueue) !== null) {
-      /** если очередь задач не пуста */
+      /** если очередь задач не пуста, запускаем синхронно flushWork */
       isHostCallbackScheduled = true;
       requestHostCallback(flushWork);
     } else {
       const firstTimer = peek(timerQueue);
+      /** если очередь таймеров не пуста , планиурем заново handleTimeout  */
       if (firstTimer !== null) {
         requestHostTimeout(handleTimeout, firstTimer.startTime - currentTime);
       }
@@ -177,7 +182,8 @@ function flushWork(hasTimeRemaining, initialTime) {
  * @memberof Scheduler Code
  * @param hasTimeRemaining {boolean}
  * @param initialTime {number}
- * @returns {boolean} возврат полностью бесполезен, он нигде не используется
+ * @returns {boolean} Возврат используется в функции performWorkUntilDeadline для определения есть ли еще работа, если есть,
+ * то планируем новый workLoop. При планировании flushWork, который вызывает workLoop присваивается переменной scheduledHostCallback
  */
 function workLoop(hasTimeRemaining, initialTime) {
   let currentTime = initialTime;
@@ -186,6 +192,7 @@ function workLoop(hasTimeRemaining, initialTime) {
 
   /** выполнять пока есть задачи и планировщик не остановлен */
   while (currentTask !== null &amp;&amp; !isSchedulerPaused) {
+    /** если время вышло у задачи, то выходим из цикла */
     if (
       currentTask.expirationTime > currentTime &amp;&amp;
       (!hasTimeRemaining || shouldYieldToHost())
@@ -202,22 +209,28 @@ function workLoop(hasTimeRemaining, initialTime) {
       const continuationCallback = callback(didUserCallbackTimeout);
       currentTime = getCurrentTime();
       if (typeof continuationCallback === "function") {
+        /** если задача возвращает функцию, то помещаем эту функцию в эту же задачу */
         currentTask.callback = continuationCallback;
       } else {
+        /** удаляем функцию, если задача не возвращает функцию */
         if (currentTask === peek(taskQueue)) {
           pop(taskQueue);
         }
       }
       advanceTimers(currentTime);
     } else {
+      /** удаляем таску, если задача не имеет функции */
       pop(taskQueue);
     }
+    /** берем новую задачу из очереди задач */
     currentTask = peek(taskQueue);
   }
-  // Return whether there's additional work
+
   if (currentTask !== null) {
+    /** Если есть еще задачи в очереди, возвращаем true (есть еще работа) */
     return true;
   } else {
+    /** Проеряем есть ли задачи в очереди таймеров, если есть, то планируем новый flushWork  */
     const firstTimer = peek(timerQueue);
     if (firstTimer !== null) {
       requestHostTimeout(handleTimeout, firstTimer.startTime - currentTime);
@@ -308,7 +321,6 @@ function unstable_wrapCallback(callback) {
  *           }} объект новой таски с метаданными
  */
 function unstable_scheduleCallback(priorityLevel, callback, options) {
-  ё;
   var currentTime = getCurrentTime();
 
   /** определение startTime */
@@ -377,7 +389,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
       requestHostTimeout(handleTimeout, startTime - currentTime);
     }
   } else {
-    /** если задаче не установлен  delay */
+    /** если задаче не установлен delay, то задача попадает в очередь тасок */
     newTask.sortIndex = expirationTime;
     push(taskQueue, newTask);
 
@@ -406,7 +418,7 @@ function unstable_continueExecution() {
 
 /**
  * @memberof Scheduler Code
- *  @description Отдает самый верхний элемент кучи с самым высоким приоритетом
+ *  @description Отдает самый верхний элемент кучи тасок с самым высоким приоритетом
  *  @return {{ id: number, sortIndex: number} | null} если куча не пуста,
  *  то возвращаем элемент с самым высоким приоритетом, иначе null
  */
@@ -527,6 +539,7 @@ const performWorkUntilDeadline = () => {
     // the message event.
     deadline = currentTime + yieldInterval;
     /** Значение нигде не меняется и так передается в scheduledHostCallback (flushWork), а затем workLoop  */
+      //todo посмотреть, не удалил ли я ниего лишнего
     const hasTimeRemaining = true;
 
     // If a scheduler task throws, exit the current browser task so the
@@ -655,13 +668,13 @@ export {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="Scheduler%2520Code.html">Scheduler Code</a></li><li><a href="Scheduler%2520Heap%2520Code.html">Scheduler Heap Code</a></li></ul><h3>Global</h3><ul><li><a href="global.html#isMessageLoopRunning">isMessageLoopRunning</a></li><li><a href="global.html#NoPriority">NoPriority</a></li><li><a href="global.html#hasMoreWork">hasMoreWork</a></li><li><a href="global.html#slowTask">slowTask</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="Scheduler%2520Code.html">Scheduler Code</a></li><li><a href="Scheduler%2520Heap%2520Code.html">Scheduler Heap Code</a></li></ul><h3>Global</h3><ul><li><a href="global.html#advanceTimers">advanceTimers</a></li><li><a href="global.html#isMessageLoopRunning">isMessageLoopRunning</a></li><li><a href="global.html#NoPriority">NoPriority</a></li><li><a href="global.html#hasMoreWork">hasMoreWork</a></li><li><a href="global.html#slowTask">slowTask</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Thu Dec 16 2021 13:58:55 GMT+0300 (Москва, стандартное время)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Sat Feb 05 2022 15:15:44 GMT+0300 (Москва, стандартное время)
 </footer>
 
 <script> prettyPrint(); </script>
